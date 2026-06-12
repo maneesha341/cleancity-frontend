@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="390" height="844" viewBox="0 0 390 844"
+     xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a5c3f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D9E75;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="390" height="844" fill="url(#bg)"/>
+  <text x="195" y="382"
+        font-size="80" text-anchor="middle"
+        font-family="Segoe UI Emoji, sans-serif">🌱</text>
+  <text x="195" y="462"
+        font-size="48" text-anchor="middle" fill="white"
+        font-family="Arial, sans-serif" font-weight="bold">CleanCity</text>
+  <text x="195" y="522"
+        font-size="24" text-anchor="middle" fill="rgba(255,255,255,0.8)"
+        font-family="Arial, sans-serif">Waste Management App</text>
+</svg>

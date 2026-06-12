@@ -1,0 +1,7 @@
+node_modules
+.env
+.env.local
+.env.production
+build
+create-icons.js
+generate-icons.js
