@@ -1,12 +1,8 @@
 import React, { createContext, useState, useContext } from 'react';
 import axios from 'axios';
-import React, { createContext, useState, useContext } from 'react';
-import axios from 'axios';
 
-axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL || '';  // ← ADD THIS LINE
+axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL || '';
 
-const AuthContext = createContext();
-// ... rest stays same
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -35,7 +31,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password, role) => {
-    const { data } = await axios.post('/api/auth/register', { name, email, password, role });
+    const { data } = await axios.post('/api/auth/register',
+      { name, email, password, role });
     localStorage.setItem('user', JSON.stringify(data));
     setUser(data);
     return data;
