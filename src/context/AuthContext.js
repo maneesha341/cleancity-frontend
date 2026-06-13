@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext } from 'react';
 import axios from 'axios';
 
 axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL || '';
