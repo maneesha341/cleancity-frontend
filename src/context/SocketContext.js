@@ -13,25 +13,34 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!user) return;
 
-    // Connect to socket server
-   const newSocket = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000');
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+    // Don't connect if already connected
+    const newSocket = io(BACKEND_URL, {
+      transports: ['websocket'],
+      reconnectionAttempts: 3,
+      reconnectionDelay: 3000,
+      timeout: 10000,
+      forceNew: false,
+    });
+
     setSocket(newSocket);
 
-    // Join personal room
-    newSocket.emit('join', user._id);
+    newSocket.on('connect', () => {
+      newSocket.emit('join', user._id);
+    });
 
-    // Listen for new report (admin)
+    newSocket.on('connect_error', (err) => {
+      console.log('Socket error:', err.message);
+      newSocket.close();
+    });
+
     newSocket.on('newReport', (data) => {
       addNotification({ type: 'newReport', message: data.message, icon: '🗑️' });
     });
 
-    // Listen for status updates (citizen)
     newSocket.on('statusUpdate', (data) => {
-      const icons = {
-        assigned:  '🚛',
-        collected: '✅',
-        resolved:  '🎉'
-      };
+      const icons = { assigned: '🚛', collected: '✅', resolved: '🎉' };
       addNotification({
         type:    'statusUpdate',
         message: data.message,
@@ -39,17 +48,23 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-    // Listen for new task (driver)
     newSocket.on('newTask', (data) => {
       addNotification({ type: 'newTask', message: data.message, icon: '📋' });
     });
 
-    return () => newSocket.close();
-  }, [user]);
+    return () => {
+      newSocket.off('connect');
+      newSocket.off('connect_error');
+      newSocket.off('newReport');
+      newSocket.off('statusUpdate');
+      newSocket.off('newTask');
+      newSocket.close();
+    };
+  }, [user?._id]);
 
   const addNotification = (notification) => {
     const n = { ...notification, id: Date.now(), time: new Date(), read: false };
-    setNotifications(prev => [n, ...prev].slice(0, 20)); // keep last 20
+    setNotifications(prev => [n, ...prev].slice(0, 20));
     setUnreadCount(prev => prev + 1);
   };
 
