@@ -13,52 +13,60 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!user) return;
 
-    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
 
-    // Don't connect if already connected
-    const newSocket = io(BACKEND_URL, {
-      transports: ['websocket'],
-      reconnectionAttempts: 3,
-      reconnectionDelay: 3000,
-      timeout: 10000,
-      forceNew: false,
-    });
+    let socketInstance = null;
+    let connectTimeout = null;
 
-    setSocket(newSocket);
-
-    newSocket.on('connect', () => {
-      newSocket.emit('join', user._id);
-    });
-
-    newSocket.on('connect_error', (err) => {
-      console.log('Socket error:', err.message);
-      newSocket.close();
-    });
-
-    newSocket.on('newReport', (data) => {
-      addNotification({ type: 'newReport', message: data.message, icon: '🗑️' });
-    });
-
-    newSocket.on('statusUpdate', (data) => {
-      const icons = { assigned: '🚛', collected: '✅', resolved: '🎉' };
-      addNotification({
-        type:    'statusUpdate',
-        message: data.message,
-        icon:    icons[data.status] || '🔔'
+    // Small delay before connecting to prevent loops
+    connectTimeout = setTimeout(() => {
+      socketInstance = io(BACKEND_URL, {
+        transports:           ['websocket', 'polling'],
+        reconnectionAttempts: 3,
+        reconnectionDelay:    5000,
+        timeout:              20000,
       });
-    });
 
-    newSocket.on('newTask', (data) => {
-      addNotification({ type: 'newTask', message: data.message, icon: '📋' });
-    });
+      socketInstance.on('connect', () => {
+        console.log('✅ Socket connected');
+        socketInstance.emit('join', user._id);
+      });
+
+      socketInstance.on('disconnect', (reason) => {
+        console.log('Socket disconnected:', reason);
+      });
+
+      socketInstance.on('connect_error', (err) => {
+        console.log('Socket error — notifications disabled:', err.message);
+        socketInstance.close();
+      });
+
+      socketInstance.on('newReport', (data) => {
+        addNotification({ type: 'newReport', message: data.message, icon: '🗑️' });
+      });
+
+      socketInstance.on('statusUpdate', (data) => {
+        const icons = { assigned: '🚛', collected: '✅', resolved: '🎉' };
+        addNotification({
+          type:    'statusUpdate',
+          message: data.message,
+          icon:    icons[data.status] || '🔔'
+        });
+      });
+
+      socketInstance.on('newTask', (data) => {
+        addNotification({ type: 'newTask', message: data.message, icon: '📋' });
+      });
+
+      setSocket(socketInstance);
+    }, 2000); // wait 2 seconds before connecting
 
     return () => {
-      newSocket.off('connect');
-      newSocket.off('connect_error');
-      newSocket.off('newReport');
-      newSocket.off('statusUpdate');
-      newSocket.off('newTask');
-      newSocket.close();
+      clearTimeout(connectTimeout);
+      if (socketInstance) {
+        socketInstance.removeAllListeners();
+        socketInstance.close();
+      }
     };
   }, [user?._id]);
 

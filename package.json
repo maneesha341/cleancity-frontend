@@ -1,32 +1,24 @@
 {
   "name": "waste-management-frontend",
   "version": "1.0.0",
+  "proxy": "http://localhost:5001",
   "dependencies": {
-    "@react-google-maps/api": "^2.20.8",
     "axios": "^1.4.0",
-    "chart.js": "^4.5.1",
+    "@react-google-maps/api": "^2.19.2",
+    "chart.js": "^4.3.3",
     "react": "^18.2.0",
-    "react-chartjs-2": "^5.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0",
     "react-scripts": "5.0.1",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.7.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "set PORT=3001 && react-scripts start",
     "build": "CI=false react-scripts build"
   },
-  "proxy": "http://localhost:5000",
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version"]
   }
 }
